@@ -22,7 +22,6 @@ EBTNodeResult::Type URandLocBTTask_BlackboardBase::ExecuteTask(UBehaviorTreeComp
 	if (navSystem->GetRandomReachablePointInRadius(Origin, 1500, loc)) {
 		OwnerComp.GetBlackboardComponent()->SetValueAsVector(TEXT("RandomLocation"),loc.Location);
 	}
-	delete owner;
-	delete navSystem;
+	
 	return EBTNodeResult::Succeeded;
 }

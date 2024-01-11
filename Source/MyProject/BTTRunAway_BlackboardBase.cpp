@@ -21,14 +21,14 @@ EBTNodeResult::Type UBTTRunAway_BlackboardBase::ExecuteTask(UBehaviorTreeCompone
 	}
 	UNavigationSystemV1* navSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
 	ACharacter* MyCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	FVector PlayerOrigin = MyCharacter->GetActorLocation();
-	FVector AIOrigin = owner->GetPawn()->GetActorLocation();
-	FVector Rotation = UKismetMathLibrary::FindLookAtRotation(AIOrigin, PlayerOrigin).Vector() * -500.0f;
-	FVector Sum = AIOrigin + Rotation;
-	OwnerComp.GetBlackboardComponent()->SetValueAsVector(TEXT("RunLocation"),FVector(Sum.X,Sum.Y,AIOrigin.Z));
+	if (MyCharacter) {
+		FVector PlayerOrigin = MyCharacter->GetActorLocation();
+		FVector AIOrigin = owner->GetPawn()->GetActorLocation();
+		FVector Rotation = UKismetMathLibrary::FindLookAtRotation(AIOrigin, PlayerOrigin).Vector() * -500.0f;
+		FVector Sum = AIOrigin + Rotation;
+		OwnerComp.GetBlackboardComponent()->SetValueAsVector(TEXT("RunLocation"), FVector(Sum.X, Sum.Y, AIOrigin.Z));
+	}
 
-	delete owner;
-	delete navSystem;
-	delete MyCharacter;
+	
 	return EBTNodeResult::Succeeded;
 }
