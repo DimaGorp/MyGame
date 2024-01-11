@@ -18,43 +18,35 @@ AAI_Controller::AAI_Controller()
 	SetPerceptionComponent(*CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("PerceptionComponent")));
 	//SenceConfigSight
 	SenceCongifSight = CreateDefaultSubobject<UAISenseConfig_Sight>(TEXT("Sight Config"));
-	SenceCongifSight->SightRadius = AISightRadius;
-	SenceCongifSight->LoseSightRadius = AILoseSightRadius;
-	SenceCongifSight->PeripheralVisionAngleDegrees = 60.0f;
-	SenceCongifSight->SetMaxAge(1);
-	SenceCongifSight->DetectionByAffiliation.bDetectEnemies = true;
-	SenceCongifSight->DetectionByAffiliation.bDetectFriendlies = true;
-	SenceCongifSight->DetectionByAffiliation.bDetectNeutrals = true;
+	if (SenceCongifSight) {
+		SenceCongifSight->SightRadius = AISightRadius;
+		SenceCongifSight->LoseSightRadius = AILoseSightRadius;
+		SenceCongifSight->PeripheralVisionAngleDegrees = 60.0f;
+		SenceCongifSight->SetMaxAge(1);
+		SenceCongifSight->DetectionByAffiliation.bDetectEnemies = true;
+		SenceCongifSight->DetectionByAffiliation.bDetectFriendlies = false;
+		SenceCongifSight->DetectionByAffiliation.bDetectNeutrals = false;
+	}
 	//SenceConfigHearing
 	SenceConfigHearing = CreateDefaultSubobject<UAISenseConfig_Hearing>(TEXT("Hearing Config"));
-	SenceConfigHearing->HearingRange = AIHearingRange;
-	SenceConfigHearing->LoSHearingRange = LoSHearingRange;
-	SenceConfigHearing->SetMaxAge(1);
-	SenceConfigHearing->DetectionByAffiliation.bDetectEnemies = true;
-	SenceConfigHearing->DetectionByAffiliation.bDetectFriendlies = true;
-	SenceConfigHearing->DetectionByAffiliation.bDetectNeutrals = true;
-	//SenceConfigDamage
-	SenceConfigDamage = CreateDefaultSubobject<UAISenseConfig_Damage>(TEXT("Damage Config"));
-	SenceConfigDamage->SetMaxAge(1);
+	if (SenceConfigHearing) {
+		SenceConfigHearing->HearingRange = AIHearingRange;
+		SenceConfigHearing->LoSHearingRange = LoSHearingRange;
+		SenceConfigHearing->SetMaxAge(1);
+		SenceConfigHearing->DetectionByAffiliation.bDetectEnemies = true;
+		SenceConfigHearing->DetectionByAffiliation.bDetectFriendlies = false;
+		SenceConfigHearing->DetectionByAffiliation.bDetectNeutrals = false;
+	}
 	//ConfigureSences
 	GetPerceptionComponent()->ConfigureSense(*SenceCongifSight);
 	GetPerceptionComponent()->ConfigureSense(*SenceConfigHearing);
-	GetPerceptionComponent()->ConfigureSense(*SenceConfigDamage);
 	//Binding
 	GetPerceptionComponent()->OnTargetPerceptionUpdated.AddDynamic(this, &AAI_Controller::OnPawnDetected);
 	//BehaviorTree and Blackboard
 	BTC = CreateDefaultSubobject<UBehaviorTreeComponent>(TEXT("Behavior tree component"));
 	BC = CreateDefaultSubobject<UBlackboardComponent>(TEXT("BlackBoard component"));
+}
 
-}
-AAI_Controller::~AAI_Controller()
-{
-	delete SenceCongifSight;
-	delete SenceConfigHearing;
-	delete SenceConfigDamage;
-	delete BTC;
-	delete BC;
-}
 void AAI_Controller::OnPossess(APawn* myPawn)
 {
 	Super::OnPossess(myPawn);
@@ -68,7 +60,6 @@ void AAI_Controller::OnPossess(APawn* myPawn)
 			BTC->StartTree(*character->BehaviourTree);
 		}
 	}
-	delete character;
 }
 
 FRotator AAI_Controller::GetControlRotation() const
@@ -83,38 +74,49 @@ UBlackboardComponent* AAI_Controller::getBlackBoard()
 {
 	return Blackboard;
 }
+void AAI_Controller::setIsPatrol(bool is_patrol)
+{
+	is_Patrol = is_patrol;
+}
+bool AAI_Controller::getIsPatrol()
+{
+	return is_Patrol;
+}
+void AAI_Controller::setIsHearSee(bool is_hera_see)
+{
+	 is_Hear_See = is_hera_see;
+}
+bool AAI_Controller::getIsHearSee()
+{
+	return is_Hear_See;
+}
+bool AAI_Controller::getIsAttacking()
+{
+	return is_Attacking;
+}
+void AAI_Controller::setIsAttacking(bool is_under_attack)
+{
+	this->is_Attacking = is_under_attack;
+}
 void AAI_Controller::OnPawnDetected(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
 	FAISenseID sightid = SenceCongifSight->GetSenseID();
 	FAISenseID hearid = SenceConfigHearing->GetSenseID();
-	FAISenseID damageid = SenceConfigDamage->GetSenseID();
-	if (Stimulus.Type == sightid || Stimulus.Type == hearid) {
-		if (Stimulus.WasSuccessfullySensed()) {
-			this->is_Hear = true;
-			this->is_Patrol = false;
-			Blackboard->SetValueAsBool(TEXT("is_Patrol"), is_Patrol);
-			Blackboard->SetValueAsBool(TEXT("is_Hear"), is_Hear);
-		}
-		else {
-			this->is_Hear = false;
-			this->is_Patrol = true;
-			Blackboard->ClearValue(TEXT("is_Patrol"));
-			Blackboard->ClearValue(TEXT("is_Hear"));
+	if (Stimulus.WasSuccessfullySensed()) {
+		if (Stimulus.Type == sightid || Stimulus.Type == hearid){
+			if (UpdatedActor->ActorHasTag("Player")) {
+				this->is_Hear_See = true;
+				this->is_Patrol = false;
+				Blackboard->SetValueAsBool(TEXT("is_Hear"), is_Hear_See);
+				Blackboard->SetValueAsBool(TEXT("is_Patrol"), is_Patrol);
+			}
 		}
 	}
-	else if (Stimulus.Type == damageid){
-		ACharacter* MyCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-		if (Stimulus.WasSuccessfullySensed()) {
-			this->is_Attacking = true;
-			Blackboard->SetValueAsBool(TEXT("is_Attacking"), is_Attacking);
-			Blackboard->SetValueAsObject(TEXT("Player"), MyCharacter);
-		}
-		else {
-			this->is_Attacking = false;
-			Blackboard->ClearValue(TEXT("is_Attacking"));
-			Blackboard->ClearValue(TEXT("Player"));
-		}
-		delete MyCharacter;
-
+	else {
+		this->is_Hear_See = false;
+		this->is_Patrol = true;
+		Blackboard->SetValueAsBool(TEXT("is_Patrol"), is_Patrol);
+		Blackboard->ClearValue(TEXT("is_Hear"));
 	}
+	
 }
