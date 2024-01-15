@@ -92,6 +92,7 @@ protected:
 	UCameraComponent* camera;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UMotionWarpingComponent* MotionWarpComponent;
+
 	//IS weapon equiped
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	bool is_weapon_equiped;
