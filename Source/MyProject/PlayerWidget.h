@@ -18,6 +18,8 @@ protected:
 	class UProgressBar* HelthBar;
 	UPROPERTY(EditAnywhere, meta = (BindWidget))
 	class UTextBlock* Helth_Text;
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UsePotion(bool isUsing);
 public:
 	void SetHelth(float cur_helth, float max);
 	void SetText(float cur_helth);
