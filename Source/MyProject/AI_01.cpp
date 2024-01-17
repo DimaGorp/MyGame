@@ -45,7 +45,9 @@ void AAI_01::Attack(USkeletalMeshComponent* Player, UArrowComponent* top, FName 
 void AAI_01::BeginPlay()
 {
 	Super::BeginPlay();
-	UpdateWidget(helth, maxhelth);
+	UPlayerWidget* enemy = Cast< UPlayerWidget>(UI->GetUserWidgetObject());
+	enemy->SetHelth(helth, maxhelth);
+	enemy->SetText(helth);
 
 }
 
@@ -55,7 +57,9 @@ float AAI_01::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		AAI_Controller* controller = Cast<AAI_Controller>(GetController());
 		if (helth != 0.0f && helth > 0.0f) {
 			helth -= DamageAmount;
-			UpdateWidget(helth, maxhelth);
+			UPlayerWidget* enemy = Cast< UPlayerWidget>(UI->GetUserWidgetObject());
+			enemy->SetHelth(helth, maxhelth);
+			enemy->SetText(helth);
 			if (controller) {
 				controller->setIsAttacking(true);
 				controller->setIsHearSee(false);
@@ -76,11 +80,6 @@ float AAI_01::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		return DamageAmount;
 	}
 	return DamageAmount;
-}
-
-UUserWidget* AAI_01::GetWidgetFromWidgetComponent()
-{
-	return UI->GetUserWidgetObject();
 }
 
 // Called every frame
