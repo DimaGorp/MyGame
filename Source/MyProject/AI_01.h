@@ -7,6 +7,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "PlayerWidget.h"
 #include "AI_01.generated.h"
 
 UCLASS()
