@@ -163,8 +163,9 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	if (can_apply && !is_block) {
 		if (helth > 0.0f && helth != 0.0f) {
 			helth -= DamageAmount;
-			//UE_LOG(LogTemp, Warning, TEXT("Helth is %s"), *FString::SanitizeFloat(helth));
-			UpdateUI(helth, maxhelth);
+			UE_LOG(LogTemp, Warning, TEXT("Helth is %s"), *FString::SanitizeFloat(helth));
+			UI->SetHelth(helth, maxhelth);
+			UI->SetText(helth);
 		}
 		else {
 			GameOver = CreateWidget<UUserWidget>(GetWorld(), GameOverWidget);
@@ -185,8 +186,9 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	UI = CreateWidget<UUserWidget>(GetWorld(), WidgetUI);
-	UpdateUI(helth, maxhelth);
+	UI = CreateWidget<UPlayerWidget>(GetWorld(), WidgetUI);
+	UI->SetHelth(helth, maxhelth);
+	UI->SetText(helth);
 	UI->AddToViewport();
 	APlayerController* MyController = GetWorld()->GetFirstPlayerController();
 	if (MyController) {
