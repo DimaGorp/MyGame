@@ -6,6 +6,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "PlayerWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/ArrowComponent.h"
 #include "MotionWarpingComponent.h"
@@ -39,9 +40,6 @@ public:
 	//MakingNoise
 	UFUNCTION(BlueprintCallable)
 	void MakingNoise(float volume);
-	//Healing
-	UFUNCTION(BlueprintCallable)
-	bool Heal();
 	//Get Camera
 	UCameraComponent* getCamera();
 	//Attacking
@@ -50,9 +48,6 @@ public:
 	//Method to be implmented in bluprints(no implmentation)
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
 	void DamageTaken();
-	//Update UI
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
-	void UpdateUI(float cur_helth,float max_helth);
 	//Warp at Target
 	UFUNCTION(BlueprintCallable)
 	void StartMWarping(FName victim, AActor* target);
@@ -68,7 +63,6 @@ public:
 	void StartCheckIsBack();
 private:
 	//Properties
-	//Speed
 	float speed;
 	//Helth
 	UPROPERTY(EditAnywhere, Category = Properties)
@@ -79,9 +73,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UUserWidget> GameOverWidget;
 	UUserWidget* GameOver;
-	//Player UI Widget
+	//Player UI
 	UPROPERTY(EditAnywhere, Category = UI)
-	TSubclassOf<UUserWidget> WidgetUI;
+	TSubclassOf<UPlayerWidget> WidgetUI;
+	UPlayerWidget* UI;
 	//AI stimuli source
 	UAIPerceptionStimuliSourceComponent* source_hear;
 	//Recive damage from Enemy
@@ -95,18 +90,8 @@ protected:
 	USpringArmComponent* SpringArmComp;
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* camera;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UMotionWarpingComponent* MotionWarpComponent;
-	//Player UI object reference
-	UPROPERTY(BlueprintReadWrite, Category = UI)
-	UUserWidget* UI;
-
-	//BottleOfPotionHealing
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
-	int count_of_potions = 0;
-
-
 	//IS weapon equiped
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	bool is_weapon_equiped;

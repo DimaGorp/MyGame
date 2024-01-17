@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "PlayerWidget.h"
 #include "Components/ArrowComponent.h"
 #include "MotionWarpingComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -112,19 +113,6 @@ void AMyCharacter::StopCrounching()
 void AMyCharacter::MakingNoise(float volume)
 {
 	MakeNoise(volume, this, GetActorLocation());
-}
-
-bool AMyCharacter::Heal()
-{
-	if (count_of_potions > 0) {
-		if (helth != maxhelth) {
-			helth += (maxhelth - helth);
-			UpdateUI(helth, maxhelth);
-			count_of_potions--;
-			return true;
-		}
-	}
-	return false;
 }
 
 void AMyCharacter::Attack(USkeletalMeshComponent* Player,UArrowComponent* top,FName sword_soket)
