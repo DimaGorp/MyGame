@@ -6,7 +6,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
-#include "PlayerWidget.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/ArrowComponent.h"
 #include "MotionWarpingComponent.h"
@@ -40,6 +39,9 @@ public:
 	//MakingNoise
 	UFUNCTION(BlueprintCallable)
 	void MakingNoise(float volume);
+	//Healing
+	UFUNCTION(BlueprintCallable)
+	bool Heal();
 	//Get Camera
 	UCameraComponent* getCamera();
 	//Attacking
@@ -66,6 +68,7 @@ public:
 	void StartCheckIsBack();
 private:
 	//Properties
+	//Speed
 	float speed;
 	//Helth
 	UPROPERTY(EditAnywhere, Category = Properties)
@@ -92,11 +95,18 @@ protected:
 	USpringArmComponent* SpringArmComp;
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* camera;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	class UMotionWarpingComponent* MotionWarpComponent;
 	//Player UI object reference
 	UPROPERTY(BlueprintReadWrite, Category = UI)
 	UUserWidget* UI;
+
+	//BottleOfPotionHealing
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
+	int count_of_potions = 0;
+
+
 	//IS weapon equiped
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	bool is_weapon_equiped;
