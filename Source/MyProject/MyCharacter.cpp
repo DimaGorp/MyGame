@@ -138,7 +138,7 @@ void AMyCharacter::Attack(USkeletalMeshComponent* Player,UArrowComponent* top,FN
 		IgnoredActors.Init(this,1);
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
 		ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 10.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
+		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 50.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 		if (is_hittet.bBlockingHit){
 			AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
 			if (OtherActor) {
