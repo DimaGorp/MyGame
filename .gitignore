@@ -12,7 +12,3 @@ Saved
 *.suo
 *.xcodeproj
 *.xcworkspace
-*
-!Content/Models/
-!Content/cur.umap
-
