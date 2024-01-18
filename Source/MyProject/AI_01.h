@@ -7,7 +7,6 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "PlayerWidget.h"
 #include "AI_01.generated.h"
 
 UCLASS()
@@ -43,6 +42,11 @@ public:
 	void DamageTaken();
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
 	void PlayAnim();
+	//Update Enemy Widget
+	UFUNCTION(BlueprintImplementableEvent, Category = "DamageSystem")
+	void UpdateWidget(float cur_helth,float max_helth);
+	UFUNCTION(BlueprintCallable, Category = "DamageSystem")
+	UUserWidget * GetWidgetFromWidgetComponent();
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

@@ -3,7 +3,6 @@
 #include "AI_Controller.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "PlayerWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -46,9 +45,7 @@ void AAI_01::Attack(USkeletalMeshComponent* Player, UArrowComponent* top, FName 
 void AAI_01::BeginPlay()
 {
 	Super::BeginPlay();
-	UPlayerWidget* enemy = Cast< UPlayerWidget>(UI->GetUserWidgetObject());
-	enemy->SetHelth(helth, maxhelth);
-	enemy->SetText(helth);
+	UpdateWidget(helth, maxhelth);
 
 }
 
@@ -58,9 +55,7 @@ float AAI_01::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		AAI_Controller* controller = Cast<AAI_Controller>(GetController());
 		if (helth != 0.0f && helth > 0.0f) {
 			helth -= DamageAmount;
-			UPlayerWidget* enemy = Cast< UPlayerWidget>(UI->GetUserWidgetObject());
-			enemy->SetHelth(helth, maxhelth);
-			enemy->SetText(helth);
+			UpdateWidget(helth, maxhelth);
 			if (controller) {
 				controller->setIsAttacking(true);
 				controller->setIsHearSee(false);
@@ -81,6 +76,11 @@ float AAI_01::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 		return DamageAmount;
 	}
 	return DamageAmount;
+}
+
+UUserWidget* AAI_01::GetWidgetFromWidgetComponent()
+{
+	return UI->GetUserWidgetObject();
 }
 
 // Called every frame
