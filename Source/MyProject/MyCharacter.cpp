@@ -10,6 +10,7 @@
 #include "Components/ArrowComponent.h"
 #include "MotionWarpingComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/GameplayStatics.h"
 #include <iostream>
 #include <cmath>
 // Sets default values
@@ -156,6 +157,13 @@ UCameraComponent* AMyCharacter::getCamera()
 	return camera;
 }
 
+void AMyCharacter::decreasenemycount()
+{
+	count_of_enemies--;
+	UpdateEnemyCountUI(count_of_enemies);
+	CheckWinning();
+}
+
 float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (can_apply && !is_block) {
@@ -171,6 +179,7 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 				MyController->bShowMouseCursor = true;
 				MyController->SetInputMode(FInputModeUIOnly());
 			}
+			UGameplayStatics::SetGamePaused(GetWorld(), true);
 			GameOver->AddToViewport(0);
 			this->Destroy();
 		}
@@ -191,6 +200,10 @@ void AMyCharacter::BeginPlay()
 		MyController->bShowMouseCursor = false;
 		MyController->SetInputMode(FInputModeGameOnly());
 	}
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAI_01::StaticClass(), FoundActors);
+	count_of_enemies = FoundActors.Num();
+	UpdateEnemyCountUI(count_of_enemies);
 }
 
 
@@ -216,6 +229,22 @@ void AMyCharacter::StartTarget()
 			}
 			is_targeting = true;
 		}
+	}
+}
+
+void AMyCharacter::CheckWinning()
+{
+	if (count_of_enemies == 0) {
+		UI->RemoveFromViewport();
+		Win = CreateWidget<UUserWidget>(GetWorld(), WinWidget);
+		APlayerController* MyController = GetWorld()->GetFirstPlayerController();
+		if (MyController) {
+			MyController->bShowMouseCursor = true;
+			MyController->SetInputMode(FInputModeUIOnly());
+		}
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
+		this->Destroy();
+		Win->AddToViewport(0);
 	}
 }
 
