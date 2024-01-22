@@ -173,6 +173,7 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 			UpdateUI(helth, maxhelth);
 		}
 		else {
+			UI->RemoveFromViewport();
 			GameOver = CreateWidget<UUserWidget>(GetWorld(), GameOverWidget);
 			APlayerController* MyController = GetWorld()->GetFirstPlayerController();
 			if (MyController) {
