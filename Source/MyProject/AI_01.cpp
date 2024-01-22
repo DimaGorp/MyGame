@@ -68,7 +68,9 @@ float AAI_01::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AC
 			}
 		}
 		else {
+			AMyCharacter* player = Cast<AMyCharacter>(DamageCauser);
 			this->Destroy();
+			player->decreasenemycount();
 			controller->getBlackBoard()->ClearValue(TEXT("is_calling_for_help"));
 		}
 		UE_LOG(LogTemp, Warning, TEXT("HIt Actor %s"), *DamageCauser->GetName());

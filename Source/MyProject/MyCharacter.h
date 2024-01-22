@@ -44,6 +44,9 @@ public:
 	bool Heal();
 	//Get Camera
 	UCameraComponent* getCamera();
+	//decrease amout of enemies
+	UFUNCTION(BlueprintCallable)
+	void decreasenemycount();
 	//Attacking
 	UFUNCTION(BlueprintCallable)
 	void Attack(USkeletalMeshComponent *Player,UArrowComponent *top, FName sword_soket);
@@ -66,6 +69,8 @@ public:
 	//TargetAtBack
 	UFUNCTION(BlueprintCallable)
 	void StartCheckIsBack();
+	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
+	void UpdateEnemyCountUI(int enemies);
 private:
 	//Properties
 	//Speed
@@ -79,6 +84,10 @@ private:
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UUserWidget> GameOverWidget;
 	UUserWidget* GameOver;
+	//Win Widget
+	UPROPERTY(EditAnywhere, Category = UI)
+	TSubclassOf<UUserWidget> WinWidget;
+	UUserWidget* Win;
 	//Player UI Widget
 	UPROPERTY(EditAnywhere, Category = UI)
 	TSubclassOf<UUserWidget> WidgetUI;
@@ -89,6 +98,7 @@ private:
 	virtual void BeginPlay() override;
 	//Target Lock objects
 	void StartTarget();
+	void CheckWinning();
 protected:
 	//Components in Viewport 
 	UPROPERTY(VisibleAnywhere)
@@ -105,6 +115,10 @@ protected:
 	//BottleOfPotionHealing
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	int count_of_potions = 0;
+
+	//BottleOfPotionHealing
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
+	int count_of_enemies = 0;
 
 
 	//IS weapon equiped
