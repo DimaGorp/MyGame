@@ -169,7 +169,6 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	if (can_apply && !is_block) {
 		if (helth > 0.0f && helth != 0.0f) {
 			helth -= DamageAmount;
-			//UE_LOG(LogTemp, Warning, TEXT("Helth is %s"), *FString::SanitizeFloat(helth));
 			UpdateUI(helth, maxhelth);
 		}
 		else {
@@ -222,7 +221,7 @@ void AMyCharacter::StartTarget()
 		IgnoredActors.Init(this, 1);
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
 		ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 100.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::ForDuration, is_hittet, true);
+		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 200.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 		if (is_hittet.bBlockingHit) {
 			AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
 			if (OtherActor){
@@ -258,7 +257,7 @@ void AMyCharacter::StartCheckIsBack()
 	IgnoredActors.Init(this, 1);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
 	ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-	UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 50.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::ForDuration, is_hittet, true);
+	UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 200.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 	if (is_hittet.bBlockingHit) {
 		AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
 		if (OtherActor) {
@@ -272,7 +271,6 @@ void AMyCharacter::StartCheckIsBack()
 			Location -= RotRight;
 			if ((GetActorLocation() - OtherActor->GetActorLocation()).Length() <= 300.0f){
 				if(UKismetMathLibrary::Dot_VectorVector(UKismetMathLibrary::GetDirectionUnitVector(GetActorLocation(), Location),GetActorForwardVector()) <=45.0f){
-				//if (UKismetMathLibrary::InverseTransformLocation(OtherActor->GetActorTransform(), Location).Y <= 0.0f) {
 					TakeDown(OtherActor, Location, Rotation);
 				}
 			}
