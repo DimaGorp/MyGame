@@ -9,9 +9,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyAllTypes.h"
 #include "RandLocBTTask_BlackboardBase.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class MYPROJECT_API URandLocBTTask_BlackboardBase : public UBTTask_BlackboardBase
 {
