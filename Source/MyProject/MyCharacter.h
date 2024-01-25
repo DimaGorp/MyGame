@@ -69,6 +69,7 @@ public:
 	//TargetAtBack
 	UFUNCTION(BlueprintCallable)
 	void StartCheckIsBack();
+	//PLayer UI Update enemy count icon
 	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
 	void UpdateEnemyCountUI(int enemies);
 private:
@@ -96,6 +97,8 @@ private:
 	//Recive damage from Enemy
 	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void BeginPlay() override;
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 	//Target Lock objects
 	void StartTarget();
 	void CheckWinning();
@@ -116,7 +119,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	int count_of_potions = 0;
 
-	//BottleOfPotionHealing
+	//EnemiesAmount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	int count_of_enemies = 0;
 
@@ -124,20 +127,22 @@ protected:
 	//IS weapon equiped
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	bool is_weapon_equiped;
-	//Variable to take onlu one damage by sphere trace
+	//Variable to take only one damage by sword trace
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool can_apply = true;
 	//Block variable
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_block = false;
-	//Object that is target
+	//bool variable if object is under targetting 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_targeting = false;
+	//Object that is targetting
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Targets)
 	AActor* target_object;
 	//Is Player Attack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_Attacking = false;
+	//Is PLayer Crouch
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_Crouch = false;
 
