@@ -15,43 +15,56 @@ class MYPROJECT_API AAI_01 : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
 	AAI_01();
-	//Widget Component
-	UPROPERTY(EditAnywhere)
-	UWidgetComponent* UI;
+
+	//SetSpeed
+	void SetMaxWalkSpeed(float speed);
+
+	//Bluprint RecieveDamage
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
+	void DamageTaken();
+
+	//Play Attack Animation 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
+	void PlayAnim();
+
+	//Update Enemy Widget UI
+	UFUNCTION(BlueprintImplementableEvent, Category = "DamageSystem")
+	void UpdateWidget(float cur_helth, float max_helth);
+
+	//Get Widget from WidgetComponent
+	UFUNCTION(BlueprintCallable, Category = "DamageSystem")
+	UUserWidget* GetWidgetFromWidgetComponent();
+
+	//Sword Trace
 	UFUNCTION(BlueprintCallable)
 	void Attack(USkeletalMeshComponent* Player, UArrowComponent* top, FName sword_soket);
-protected:
+	UBehaviorTree* getBehaviourTree();
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	UPROPERTY(EditAnywhere,Category = Properties)
+private:
+	//ReceiveDamage
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	//Binding
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;	
+protected:
+	//Enemy UI Widget Component
+	UPROPERTY(EditAnywhere)
+	UWidgetComponent* UI;
+	//BehaviorTree
+	UPROPERTY(EditAnywhere, Category = AI)
+	UBehaviorTree* BehaviourTree;
+	//Properties
+	//Helth
+	UPROPERTY(EditAnywhere, Category = Properties)
 	float maxhelth = 200.0f;
 	UPROPERTY(EditAnywhere, Category = Properties)
 	float helth = maxhelth;
-	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Properties)
-	bool can_apply = true;
+	//Can Take Damage
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
-	bool is_block = false;
-private:
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-public:	
-	UPROPERTY(EditAnywhere, Category = AI)
-	UBehaviorTree* BehaviourTree;
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
-	void DamageTaken();
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
-	void PlayAnim();
-	//Update Enemy Widget
-	UFUNCTION(BlueprintImplementableEvent, Category = "DamageSystem")
-	void UpdateWidget(float cur_helth,float max_helth);
-	UFUNCTION(BlueprintCallable, Category = "DamageSystem")
-	UUserWidget * GetWidgetFromWidgetComponent();
-
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-	
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	void SetMaxWalkSpeed(float speed);
+	bool can_apply = true;
 };

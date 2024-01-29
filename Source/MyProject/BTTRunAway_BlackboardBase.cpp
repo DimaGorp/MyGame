@@ -19,13 +19,20 @@ EBTNodeResult::Type UBTTRunAway_BlackboardBase::ExecuteTask(UBehaviorTreeCompone
 	if (owner == nullptr) {
 		return EBTNodeResult::Failed;
 	}
+	//Get Navigation Mesh
 	UNavigationSystemV1* navSystem = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+	//Get Player
 	ACharacter* MyCharacter = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 	if (MyCharacter) {
+		//Get Player Location
 		FVector PlayerOrigin = MyCharacter->GetActorLocation();
+		//Get AI Location
 		FVector AIOrigin = owner->GetPawn()->GetActorLocation();
+		//Get the opposite direction of AI face to a player vector
 		FVector Rotation = UKismetMathLibrary::FindLookAtRotation(AIOrigin, PlayerOrigin).Vector() * -500.0f;
+		//Choose new location from AI location and opposite direction vector
 		FVector Sum = AIOrigin + Rotation;
+		//Set value as a Vector in BlackBoard Key
 		OwnerComp.GetBlackboardComponent()->SetValueAsVector(TEXT("RunLocation"), FVector(Sum.X, Sum.Y, AIOrigin.Z));
 	}
 

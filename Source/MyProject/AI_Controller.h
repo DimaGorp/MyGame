@@ -19,18 +19,8 @@ class MYPROJECT_API AAI_Controller : public AAIController
 	GENERATED_BODY()
 public:
 	AAI_Controller();
-	virtual void OnPossess(APawn* myPawn) override;
-	virtual FRotator GetControlRotation() const override;
-	UPROPERTY(EditAnywhere,Category = AI)
-	float AISightRadius = 500.0f;
-	UPROPERTY(EditAnywhere, Category = AI)
-	float AILoseSightRadius = 1000.0f;
-	UPROPERTY(EditAnywhere, Category = AI)
-	float AIHearingRange = 1500.0f;
-	UPROPERTY(EditAnywhere, Category = AI)
-	float LoSHearingRange = 1600.0f;
 
-	//MyFunctions
+	//get Blackboard
 	UBlackboardComponent* getBlackBoard();
 	//is_Patrol
 	void setIsPatrol(bool is_patrol);
@@ -41,17 +31,34 @@ public:
 	//is_attacking
 	bool getIsAttacking();
 	void setIsAttacking(bool is_under_attack);
-private:
+protected:
+	UBehaviorTreeComponent* BTC;
+	UBlackboardComponent* BC;
+	//Initialize AI Start Behaiviour and Run Behaivior Tree
+	virtual void OnPossess(APawn* myPawn) override;
+
+	virtual FRotator GetControlRotation() const override;
+	//Sight Radius
+	UPROPERTY(EditAnywhere, Category = AI)
+	float AISightRadius = 500.0f;
+	//Sight Radius where AI lose focus
+	UPROPERTY(EditAnywhere, Category = AI)
+	float AILoseSightRadius = 1000.0f;
+	//Hear Radius
+	UPROPERTY(EditAnywhere, Category = AI)
+	float AIHearingRange = 1500.0f;
+	//Hear Radius where AI cant hear player
+	UPROPERTY(EditAnywhere, Category = AI)
+	float LoSHearingRange = 1600.0f;
+
+	//Configs for see and hear player
 	class UAISenseConfig_Sight* SenceCongifSight;
 	class UAISenseConfig_Hearing* SenceConfigHearing;
-	UFUNCTION()
-	void OnPawnDetected(AActor* UpdatedActor, FAIStimulus Stimulus);
-	//BlackBoard varibles
+	//BlackBoard values
 	bool is_Patrol = false;
 	bool is_Hear_See = false;
 	bool is_Attacking = false;
-
-
-	UBehaviorTreeComponent* BTC;
-	UBlackboardComponent* BC;
+	//Function to Update Logic When See a Player
+	UFUNCTION()
+	void OnPawnDetected(AActor* UpdatedActor, FAIStimulus Stimulus);
 };
