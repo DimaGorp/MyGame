@@ -54,10 +54,13 @@ void AAI_Controller::OnPossess(APawn* myPawn)
 	AAI_01* character = Cast<AAI_01>(myPawn);
 	if (character)
 	{
-		if (character->BehaviourTree->BlackboardAsset) {
-			Blackboard->InitializeBlackboard(*(character->BehaviourTree->BlackboardAsset));
+		if (character->getBehaviourTree()->BlackboardAsset) {
+			//Init Blackboarf
+			Blackboard->InitializeBlackboard(*(character->getBehaviourTree()->BlackboardAsset));
+			//Set Value to Blackboard to Patrol
 			Blackboard->SetValueAsBool(TEXT("is_Patrol"), is_Patrol);
-			BTC->StartTree(*character->BehaviourTree);
+			//Start Logic in BehaviourTree
+			BTC->StartTree(*character->getBehaviourTree());
 		}
 	}
 }
@@ -74,6 +77,7 @@ UBlackboardComponent* AAI_Controller::getBlackBoard()
 {
 	return Blackboard;
 }
+//get and set variables for BlackBoard 
 void AAI_Controller::setIsPatrol(bool is_patrol)
 {
 	is_Patrol = is_patrol;
@@ -98,13 +102,19 @@ void AAI_Controller::setIsAttacking(bool is_under_attack)
 {
 	this->is_Attacking = is_under_attack;
 }
+
 void AAI_Controller::OnPawnDetected(AActor* UpdatedActor, FAIStimulus Stimulus)
 {
+	//Get Id of Senses
 	FAISenseID sightid = SenceCongifSight->GetSenseID();
 	FAISenseID hearid = SenceConfigHearing->GetSenseID();
+	//AI sense activated
 	if (Stimulus.WasSuccessfullySensed()) {
+		//What type of sense is activated
 		if (Stimulus.Type == sightid || Stimulus.Type == hearid){
+			//Make Sure that is is Player
 			if (UpdatedActor->ActorHasTag("Player")) {
+				//Stop Patrolling and Run Away from Player
 				this->is_Hear_See = true;
 				this->is_Patrol = false;
 				Blackboard->SetValueAsBool(TEXT("is_Hear"), is_Hear_See);
@@ -113,6 +123,7 @@ void AAI_Controller::OnPawnDetected(AActor* UpdatedActor, FAIStimulus Stimulus)
 		}
 	}
 	else {
+		//Continue Patrolling
 		this->is_Hear_See = false;
 		this->is_Patrol = true;
 		Blackboard->SetValueAsBool(TEXT("is_Patrol"), is_Patrol);

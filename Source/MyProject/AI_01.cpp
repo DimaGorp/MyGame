@@ -10,11 +10,13 @@
 // Sets default values
 AAI_01::AAI_01()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	//Create BehaviourTree
 	BehaviourTree = CreateDefaultSubobject<UBehaviorTree>(TEXT("BehaviorTree"));
+	//Create ViewPort components
 	UI = CreateDefaultSubobject<UWidgetComponent>(TEXT("WidgetComponent"));
 	UI->SetupAttachment(RootComponent);
+	//Set Begin speed
 	this->GetCharacterMovement()->MaxWalkSpeed = 250.0f;
 }
 
@@ -23,67 +25,78 @@ AAI_01::AAI_01()
 void AAI_01::Attack(USkeletalMeshComponent* Player, UArrowComponent* top, FName sword_soket)
 {
 	FHitResult is_hittet;
+	//get start and end location of sword
 	FVector start = Player->GetSocketLocation(sword_soket);
 	FVector end = top->GetComponentLocation();
+	//Objects to ignore tracing
 	TArray<AActor*> IgnoredActors;
 	IgnoredActors.Init(this, 1);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
 	ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+	//Sphere Trace
 	UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 10.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 	if (is_hittet.bBlockingHit) {
 		AMyCharacter* OtherActor = Cast<AMyCharacter>(is_hittet.GetActor());
 		if (OtherActor) {
-			if ((is_hittet.Location - start).Length() <= 500.0f) {
-				UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
-			}
-
+			UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
 		}
 	}
+}
+
+UBehaviorTree* AAI_01::getBehaviourTree()
+{
+	return BehaviourTree;
 }
 
 // Called when the game starts or when spawned
 void AAI_01::BeginPlay()
 {
 	Super::BeginPlay();
+	//Set helth into Enemy UI
 	UpdateWidget(helth, maxhelth);
 
 }
 
 float AAI_01::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (can_apply && !is_block) {
+	if (can_apply) {
 		AAI_Controller* controller = Cast<AAI_Controller>(GetController());
 		if (helth != 0.0f && helth > 0.0f) {
 			helth -= DamageAmount;
 			UpdateWidget(helth, maxhelth);
 			if (controller) {
+				//set Attack bool variable
 				controller->setIsAttacking(true);
+				//set variable for AIPerception
 				controller->setIsHearSee(false);
+				//Patrolling boll variable
 				controller->setIsPatrol(false);
+				//Write varibles in blackboard
 				controller->getBlackBoard()->SetValueAsBool(TEXT("is_Patrol"), controller->getIsPatrol());
 				controller->getBlackBoard()->SetValueAsBool(TEXT("is_Hear"), controller->getIsHearSee());
 				controller->getBlackBoard()->SetValueAsBool(TEXT("is_Attacking"), controller->getIsAttacking());
 				controller->getBlackBoard()->SetValueAsObject(TEXT("Player"), DamageCauser);
-				//controller->getBlackBoard()->SetValueAsObject(TEXT("AI"), this);
 			}
 		}
 		else {
+			AMyCharacter* player = Cast<AMyCharacter>(DamageCauser);
 			this->Destroy();
-			controller->getBlackBoard()->ClearValue(TEXT("is_calling_for_help"));
+			//Change Enemies amout
+			player->decreasenemycount();
 		}
-		UE_LOG(LogTemp, Warning, TEXT("HIt Actor %s"), *DamageCauser->GetName());
+		//Call Bluprint Event after Recieve Damage
 		DamageTaken();
 		return DamageAmount;
 	}
 	return DamageAmount;
 }
-
+//Get UI from WidgetComponent
 UUserWidget* AAI_01::GetWidgetFromWidgetComponent()
 {
 	return UI->GetUserWidgetObject();
 }
 
-// Called every frame
+//Event Tick
 void AAI_01::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -95,13 +108,13 @@ void AAI_01::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
+//Binding
 void AAI_01::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
-
+//Set Movement Component Speed
 void AAI_01::SetMaxWalkSpeed(float speed)
 {
 	this->GetCharacterMovement()->MaxWalkSpeed = speed;

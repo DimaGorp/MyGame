@@ -22,6 +22,7 @@ EBTNodeResult::Type UBTT_Attack_BlackboardBase::ExecuteTask(UBehaviorTreeCompone
 	}
 	AAI_01* ai = Cast<AAI_01>(owner->GetPawn());
 	if (ai) {
+		//Call Bluprint Event PlayAnim
 		ai->PlayAnim();
 	}
 	return EBTNodeResult::Succeeded;
