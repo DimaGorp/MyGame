@@ -11,6 +11,8 @@
 #include "MotionWarpingComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "AbilitySystemComponent.h"
+#include "GAS/CharacterStatsAttributeSet.h"
 #include <iostream>
 #include <cmath>
 // Sets default values
@@ -37,6 +39,9 @@ AMyCharacter::AMyCharacter():Super()
 	source_hear = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
 	source_hear->RegisterForSense(UAISense_Hearing::StaticClass());
 	this->GetCharacterMovement()->MaxWalkSpeed = speed + 250.0f;
+
+	//Gameplay Ability System Component
+	GA_Component = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("GameplayAbilitySystem Component"));
 
 
 }
@@ -217,6 +222,9 @@ void AMyCharacter::BeginPlay()
 	count_of_enemies = FoundActors.Num();
 	//Set amout of enemies at map in Player UI icon
 	UpdateEnemyCountUI(count_of_enemies);
+    if (IsValid(GA_Component)) {
+        AttributeSet = GA_Component->GetSet<UCharacterStatsAttributeSet>();
+    }
 }
 
 void AMyCharacter::Tick(float DeltaTime)
