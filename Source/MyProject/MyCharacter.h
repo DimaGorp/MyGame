@@ -9,10 +9,12 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/ArrowComponent.h"
 #include "MotionWarpingComponent.h"
+#include "AbilitySystemInterface.h"
+#include "GAS/CharacterStatsAttributeSet.h"
 #include "MyCharacter.generated.h"
 
 UCLASS()
-class MYPROJECT_API AMyCharacter : public ACharacter
+class MYPROJECT_API AMyCharacter : public ACharacter,public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -145,5 +147,14 @@ protected:
 	//Is PLayer Crouch
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_Crouch = false;
+//Gameplay Ability System
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="GAS")
+	class UAbilitySystemComponent* GA_Component;
+	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override{
+		return GA_Component;
+	}
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
+    const class UCharacterStatsAttributeSet* AttributeSet;
 
 };
