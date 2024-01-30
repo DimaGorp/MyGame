@@ -58,6 +58,9 @@ public:
 	//Update UI
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
 	void UpdateUI(float cur_helth,float max_helth);
+	//GrandPlayer and Ability
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "GAS")
+	void Grand();
 	//Warp at Target
 	UFUNCTION(BlueprintCallable)
 	void StartMWarping(FName victim, AActor* target);

@@ -225,6 +225,7 @@ void AMyCharacter::BeginPlay()
     if (IsValid(GA_Component)) {
         AttributeSet = GA_Component->GetSet<UCharacterStatsAttributeSet>();
     }
+	Grand();
 }
 
 void AMyCharacter::Tick(float DeltaTime)
