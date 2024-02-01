@@ -10,7 +10,7 @@
 #include "Components/ArrowComponent.h"
 #include "MotionWarpingComponent.h"
 #include "AbilitySystemInterface.h"
-#include "GAS/CharacterStatsAttributeSet.h"
+#include "GAS/CharacterAttributeSet.h"
 #include "MyCharacter.generated.h"
 
 UCLASS()
@@ -158,6 +158,6 @@ protected:
 		return GA_Component;
 	}
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
-    const class UCharacterStatsAttributeSet* AttributeSet;
+    const class UCharacterAttributeSet* AttributeSet;
 
 };

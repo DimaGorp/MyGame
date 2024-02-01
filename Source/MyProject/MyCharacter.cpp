@@ -12,7 +12,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "AbilitySystemComponent.h"
-#include "GAS/CharacterStatsAttributeSet.h"
+#include "GAS/CharacterAttributeSet.h"
 #include <iostream>
 #include <cmath>
 // Sets default values
@@ -223,7 +223,7 @@ void AMyCharacter::BeginPlay()
 	//Set amout of enemies at map in Player UI icon
 	UpdateEnemyCountUI(count_of_enemies);
     if (IsValid(GA_Component)) {
-        AttributeSet = GA_Component->GetSet<UCharacterStatsAttributeSet>();
+        AttributeSet = GA_Component->GetSet<UCharacterAttributeSet>();
     }
 	Grand();
 }
