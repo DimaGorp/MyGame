@@ -78,6 +78,15 @@ public:
 	//PLayer UI Update enemy count icon
 	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
 	void UpdateEnemyCountUI(int enemies);
+	//Attributes parametrs getters
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetHelth() const;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetMaxHelth() const;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetStamina() const;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetMaxStamina() const;
 private:
 	//Properties
 	//Speed

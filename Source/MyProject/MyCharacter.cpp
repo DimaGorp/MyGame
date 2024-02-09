@@ -205,9 +205,12 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	if (IsValid(GA_Component)) {
+		AttributeSet = GA_Component->GetSet<UCharacterAttributeSet>();
+	}
 	//Create Player UI
 	UI = CreateWidget<UUserWidget>(GetWorld(), WidgetUI);
-	UpdateUI(helth, maxhelth);
+	UpdateUI(GetHelth(), GetMaxHelth());
 	UI->AddToViewport();
 	//Show mouse cursor
 	APlayerController* MyController = GetWorld()->GetFirstPlayerController();
@@ -222,9 +225,7 @@ void AMyCharacter::BeginPlay()
 	count_of_enemies = FoundActors.Num();
 	//Set amout of enemies at map in Player UI icon
 	UpdateEnemyCountUI(count_of_enemies);
-    if (IsValid(GA_Component)) {
-        AttributeSet = GA_Component->GetSet<UCharacterAttributeSet>();
-    }
+
 	Grand();
 }
 
@@ -235,6 +236,7 @@ void AMyCharacter::Tick(float DeltaTime)
 		FRotator rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), target_object->GetActorLocation());
 		GetController()->SetControlRotation(FRotator(rot.Pitch - 25.0f,rot.Yaw,rot.Roll));
 	}
+	UpdateUI(GetHelth(), GetMaxHelth());
 }
 
 
@@ -324,6 +326,26 @@ void AMyCharacter::StartCheckIsBack()
 
 		}
 	}
+}
+
+float AMyCharacter::GetHelth() const
+{
+	return AttributeSet->GetHelth();
+}
+
+float AMyCharacter::GetMaxHelth() const
+{
+	return AttributeSet->GetMaxHelth();
+}
+
+float AMyCharacter::GetStamina() const
+{
+	return AttributeSet->GetStamina();
+}
+
+float AMyCharacter::GetMaxStamina() const
+{
+	return AttributeSet->GetMaxStamina();
 }
 
 

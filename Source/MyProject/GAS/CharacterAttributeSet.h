@@ -20,6 +20,9 @@ class MYPROJECT_API UCharacterAttributeSet : public UAttributeSet
 public:
     UCharacterAttributeSet();
 
+    virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue);
+
+public:
  
 
     //Helth
