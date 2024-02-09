@@ -281,6 +281,16 @@ void AMyCharacter::CheckWinning()
 	}
 }
 
+void AMyCharacter::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel)
+{
+	if (GA_Component) {
+		if (HasAuthority() && AbilityToGet) {
+			GA_Component->GiveAbility(FGameplayAbilitySpec(AbilityToGet, AbilityLevel, 0));
+		}
+		GA_Component->InitAbilityActorInfo(this, this);
+	}
+}
+
 void AMyCharacter::StartCheckIsBack()
 {
 	FHitResult is_hittet;
