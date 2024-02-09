@@ -11,6 +11,7 @@
 #include "MotionWarpingComponent.h"
 #include "AbilitySystemInterface.h"
 #include "GAS/CharacterAttributeSet.h"
+#include "Abilities/GameplayAbility.h"
 #include "MyCharacter.generated.h"
 
 UCLASS()
@@ -157,6 +158,8 @@ protected:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override{
 		return GA_Component;
 	}
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
     const class UCharacterAttributeSet* AttributeSet;
 
