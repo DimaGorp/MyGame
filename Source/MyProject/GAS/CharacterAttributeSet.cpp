@@ -11,5 +11,7 @@ UCharacterAttributeSet::UCharacterAttributeSet()
 void UCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
 	Super::PreAttributeChange(Attribute, NewValue);
-
+	if (Attribute == GetHelthAttribute()) {
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHelth());
+	}
 }
