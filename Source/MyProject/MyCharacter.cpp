@@ -179,7 +179,7 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 	if (can_apply && !is_block) {
 		if (helth > 0.0f && helth != 0.0f) {
 			helth -= DamageAmount;
-			UpdateUI(helth, maxhelth);
+			UpdateUI(GetHelth(), GetMaxHelth());
 		}
 		//Dead
 		else {
