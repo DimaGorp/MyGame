@@ -87,6 +87,9 @@ public:
 	float GetStamina() const;
 	UFUNCTION(BlueprintCallable, Category = "GAS")
 	float GetMaxStamina() const;
+
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
+	void DealDamage(AActor * Target);
 private:
 	//Properties
 	//Speed

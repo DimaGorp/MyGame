@@ -7,10 +7,13 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/WidgetComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "AbilitySystemInterface.h"
+#include "GAS/CharacterAttributeSet.h"
+#include "Abilities/GameplayAbility.h"
 #include "AI_01.generated.h"
 
 UCLASS()
-class MYPROJECT_API AAI_01 : public ACharacter
+class MYPROJECT_API AAI_01 : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -41,8 +44,21 @@ public:
 	void Attack(USkeletalMeshComponent* Player, UArrowComponent* top, FName sword_soket);
 	UBehaviorTree* getBehaviourTree();
 
+	//Bluprint RecieveDamage
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
+	void DealDamage();
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	//AttributeSet Getters
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetHelth() const;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetMaxHelth() const;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetStamina() const;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetMaxStamina() const;
 private:
 	//ReceiveDamage
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -67,4 +83,17 @@ protected:
 	//Can Take Damage
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool can_apply = true;
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
+	class UAbilitySystemComponent* GA_Component;
+	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override {
+		return GA_Component;
+	}
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
+	const class UCharacterAttributeSet* AttributeSet;
+protected:
+	//Delegated
+	FDelegateHandle HealthChangedDelegateHandle;
+	// Attribute changed callbacks
+	void HealthChanged(const FOnAttributeChangeData& Data);
 };
