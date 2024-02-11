@@ -153,7 +153,8 @@ void AMyCharacter::Attack(USkeletalMeshComponent* Player,UArrowComponent* top,FN
 		if (is_hittet.bBlockingHit){
 			AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
 			if (OtherActor) {
-				UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
+				DealDamage(OtherActor);
+				//UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
 			}
 		}
 	}
