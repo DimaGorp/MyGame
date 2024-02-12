@@ -151,10 +151,13 @@ void AMyCharacter::Attack(USkeletalMeshComponent* Player,UArrowComponent* top,FN
 		//Sphere trace by sword
 		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 50.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 		if (is_hittet.bBlockingHit){
-			AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
-			if (OtherActor) {
-				DealDamage(OtherActor);
-				//UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
+			if (is_Attacking) {
+				AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
+				if (OtherActor) {
+					DealDamage(OtherActor);
+					is_Attacking = false;
+					//UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
+				}
 			}
 		}
 	}

@@ -159,7 +159,7 @@ protected:
 	AActor* target_object;
 	//Is Player Attack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
-	bool is_Attacking = false;
+	bool is_Attacking = true;
 	//Is PLayer Crouch
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_Crouch = false;
