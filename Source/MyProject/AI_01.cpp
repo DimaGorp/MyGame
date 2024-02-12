@@ -150,7 +150,6 @@ void AAI_01::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 }
 void AAI_01::HealthChanged(const FOnAttributeChangeData& Data)
 {
-	if (can_apply) {
 		AAI_Controller* controller = Cast<AAI_Controller>(GetController());
 		if (GetHelth() != 0.0f && GetHelth() > 0.0f) {
 			UpdateWidget(GetHelth(), GetMaxHelth());
@@ -176,7 +175,6 @@ void AAI_01::HealthChanged(const FOnAttributeChangeData& Data)
 		}
 		//Call Bluprint Event after Recieve Damage
 		DamageTaken();
-	}
 }
 //Set Movement Component Speed
 void AAI_01::SetMaxWalkSpeed(float speed)
