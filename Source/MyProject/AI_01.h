@@ -43,7 +43,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Attack(USkeletalMeshComponent* Player, UArrowComponent* top, FName sword_soket);
 	UBehaviorTree* getBehaviourTree();
-
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
+	void Grand();
 	//Bluprint RecieveDamage
 	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
 	void DealDamage();
@@ -59,6 +60,8 @@ public:
 	float GetStamina() const;
 	UFUNCTION(BlueprintCallable, Category = "GAS")
 	float GetMaxStamina() const;
+
+
 private:
 	//ReceiveDamage
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
@@ -91,6 +94,9 @@ protected:
 	}
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
 	const class UCharacterAttributeSet* AttributeSet;
+
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);
 protected:
 	//Delegated
 	FDelegateHandle HealthChangedDelegateHandle;

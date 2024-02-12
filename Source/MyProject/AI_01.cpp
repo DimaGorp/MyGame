@@ -67,6 +67,7 @@ void AAI_01::BeginPlay()
 	}
 	//Set helth into Enemy UI
 	UpdateWidget(GetHelth(), GetMaxHelth());
+	Grand();
 
 }
 
@@ -147,6 +148,15 @@ void AAI_01::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+void AAI_01::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel)
+{
+	if (GA_Component) {
+		if (HasAuthority() && AbilityToGet) {
+			GA_Component->GiveAbility(FGameplayAbilitySpec(AbilityToGet, AbilityLevel, 0));
+		}
+		GA_Component->InitAbilityActorInfo(this, this);
+	}
 }
 void AAI_01::HealthChanged(const FOnAttributeChangeData& Data)
 {

@@ -59,9 +59,6 @@ public:
 	//Update UI
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
 	void UpdateUI(float cur_helth,float max_helth);
-	//GrandPlayer and Ability
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "GAS")
-	void Grand();
 	//Warp at Target
 	UFUNCTION(BlueprintCallable)
 	void StartMWarping(FName victim, AActor* target);
@@ -87,7 +84,9 @@ public:
 	float GetStamina() const;
 	UFUNCTION(BlueprintCallable, Category = "GAS")
 	float GetMaxStamina() const;
-
+	//GrandPlayer and Ability
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
+	void GrandAbility();
 	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
 	void DealDamage(AActor * Target);
 private:
@@ -170,9 +169,9 @@ protected:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override{
 		return GA_Component;
 	}
-	UFUNCTION(BlueprintCallable, Category = "GAS")
-	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
     const class UCharacterAttributeSet* AttributeSet;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);
 
 };
