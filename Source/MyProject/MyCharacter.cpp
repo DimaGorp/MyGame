@@ -230,7 +230,7 @@ void AMyCharacter::BeginPlay()
 	//Set amout of enemies at map in Player UI icon
 	UpdateEnemyCountUI(count_of_enemies);
 
-	Grand();
+	GrandAbility();
 }
 
 void AMyCharacter::Tick(float DeltaTime)
