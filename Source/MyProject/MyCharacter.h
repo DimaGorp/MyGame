@@ -88,7 +88,7 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
 	void GrandAbility();
 	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
-	void DealDamage(AActor * Target);
+	void DealDamage(AActor * Target,FVector HitLocation);
 private:
 	//Properties
 	//Speed
