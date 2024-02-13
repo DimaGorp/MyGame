@@ -154,7 +154,7 @@ void AMyCharacter::Attack(USkeletalMeshComponent* Player,UArrowComponent* top,FN
 			if (is_Attacking) {
 				AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
 				if (OtherActor) {
-					DealDamage(OtherActor);
+					DealDamage(OtherActor,is_hittet.Location);
 					is_Attacking = false;
 					//UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
 				}
