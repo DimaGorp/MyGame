@@ -96,7 +96,7 @@ protected:
 	const class UCharacterAttributeSet* AttributeSet;
 
 	UFUNCTION(BlueprintCallable, Category = "GAS")
-	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel);
+	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 InputID);
 protected:
 	//Delegated
 	FDelegateHandle HealthChangedDelegateHandle;
