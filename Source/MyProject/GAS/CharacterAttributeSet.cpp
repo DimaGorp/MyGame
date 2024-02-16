@@ -14,4 +14,8 @@ void UCharacterAttributeSet::PreAttributeChange(const FGameplayAttribute& Attrib
 	if (Attribute == GetHelthAttribute()) {
 		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHelth());
 	}
+	if (Attribute == GetDamageAttribute()) {
+		NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxHelth());
+	}
 }
+

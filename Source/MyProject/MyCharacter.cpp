@@ -287,11 +287,11 @@ void AMyCharacter::CheckWinning()
 	}
 }
 
-void AMyCharacter::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 AbilityLevel)
+void AMyCharacter::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 InputID)
 {
 	if (GA_Component) {
 		if (HasAuthority() && AbilityToGet) {
-			GA_Component->GiveAbility(FGameplayAbilitySpec(AbilityToGet, AbilityLevel, 0));
+			GA_Component->GiveAbility(FGameplayAbilitySpec(AbilityToGet, 0, InputID));
 		}
 		GA_Component->InitAbilityActorInfo(this, this);
 	}
