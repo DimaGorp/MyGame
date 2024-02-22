@@ -121,9 +121,9 @@ private:
 	void CheckWinning();
 protected:
 	//Components in Viewport 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USpringArmComponent* SpringArmComp;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UCameraComponent* camera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
