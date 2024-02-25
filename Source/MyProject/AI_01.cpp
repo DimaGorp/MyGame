@@ -41,9 +41,13 @@ void AAI_01::Attack(USkeletalMeshComponent* Player, UArrowComponent* top, FName 
 	//Sphere Trace
 	UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 10.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 	if (is_hittet.bBlockingHit) {
-		AMyCharacter* OtherActor = Cast<AMyCharacter>(is_hittet.GetActor());
-		if (OtherActor) {
-			UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
+		if (is_Attacking) {
+			AMyCharacter* OtherActor = Cast<AMyCharacter>(is_hittet.GetActor());
+			if (OtherActor) {
+				MakeDamage(OtherActor, is_hittet.Location);
+				is_Attacking = false;
+				//UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
+			}
 		}
 	}
 }
@@ -59,11 +63,8 @@ void AAI_01::BeginPlay()
 	Super::BeginPlay();
 	if (IsValid(GA_Component)) {
 		AttributeSet = GA_Component->GetSet<UCharacterAttributeSet>();
-	}
-	if (GA_Component)
-	{
 		// Attribute change callbacks
-		HealthChangedDelegateHandle = GA_Component->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHelthAttribute()).AddUObject(this, &AAI_01::HealthChanged);
+		GA_Component->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHelthAttribute()).AddUObject(this, &AAI_01::HealthChanged);
 	}
 	//Set helth into Enemy UI
 	UpdateWidget(GetHelth(), GetMaxHelth());
@@ -90,40 +91,6 @@ float AAI_01::GetMaxStamina() const
 {
 	return AttributeSet->GetMaxStamina();
 }
-
-float AAI_01::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
-	if (can_apply) {
-		AAI_Controller* controller = Cast<AAI_Controller>(GetController());
-		if (GetHelth() != 0.0f && GetHelth() > 0.0f) {
-			//helth -= DamageAmount;
-			UpdateWidget(GetHelth(), GetMaxHelth());
-			if (controller) {
-				//set Attack bool variable
-				controller->setIsAttacking(true);
-				//set variable for AIPerception
-				controller->setIsHearSee(false);
-				//Patrolling boll variable
-				controller->setIsPatrol(false);
-				//Write varibles in blackboard
-				controller->getBlackBoard()->SetValueAsBool(TEXT("is_Patrol"), controller->getIsPatrol());
-				controller->getBlackBoard()->SetValueAsBool(TEXT("is_Hear"), controller->getIsHearSee());
-				controller->getBlackBoard()->SetValueAsBool(TEXT("is_Attacking"), controller->getIsAttacking());
-				controller->getBlackBoard()->SetValueAsObject(TEXT("Player"), DamageCauser);
-			}
-		}
-		else {
-			AMyCharacter* player = Cast<AMyCharacter>(DamageCauser);
-			this->Destroy();
-			//Change Enemies amout
-			player->decreasenemycount();
-		}
-		//Call Bluprint Event after Recieve Damage
-		DamageTaken();
-		return DamageAmount;
-	}
-	return DamageAmount;
-}
 //Get UI from WidgetComponent
 UUserWidget* AAI_01::GetWidgetFromWidgetComponent()
 {
@@ -139,7 +106,6 @@ void AAI_01::Tick(float DeltaTime)
 		FRotator rot = UKismetMathLibrary::FindLookAtRotation(UI->GetComponentLocation(), MyCharacter->getCamera()->GetComponentLocation());
 		UI->SetWorldRotation(rot);
 	}
-	DealDamage();
 
 }
 
@@ -158,6 +124,7 @@ void AAI_01::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32
 		GA_Component->InitAbilityActorInfo(this, this);
 	}
 }
+
 void AAI_01::HealthChanged(const FOnAttributeChangeData& Data)
 {
 		AAI_Controller* controller = Cast<AAI_Controller>(GetController());
@@ -174,14 +141,15 @@ void AAI_01::HealthChanged(const FOnAttributeChangeData& Data)
 				controller->getBlackBoard()->SetValueAsBool(TEXT("is_Patrol"), controller->getIsPatrol());
 				controller->getBlackBoard()->SetValueAsBool(TEXT("is_Hear"), controller->getIsHearSee());
 				controller->getBlackBoard()->SetValueAsBool(TEXT("is_Attacking"), controller->getIsAttacking());
-				//controller->getBlackBoard()->SetValueAsObject(TEXT("Player"), DamageCauser);
+				AMyCharacter* player = Cast<AMyCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+				controller->getBlackBoard()->SetValueAsObject(TEXT("Player"), player);
 			}
 		}
 		else {
-			//AMyCharacter* player = Cast<AMyCharacter>(DamageCauser);
-			this->Destroy();
+			AMyCharacter* player = Cast<AMyCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 			//Change Enemies amout
-			//player->decreasenemycount();
+			player->decreasenemycount();
+			this->Destroy();
 		}
 		//Call Bluprint Event after Recieve Damage
 		DamageTaken();

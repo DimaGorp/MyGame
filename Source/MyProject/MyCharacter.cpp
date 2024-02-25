@@ -151,7 +151,7 @@ void AMyCharacter::Attack(USkeletalMeshComponent* Player,UArrowComponent* top,FN
 		//Sphere trace by sword
 		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 50.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 		if (is_hittet.bBlockingHit){
-			if (is_Attacking) {
+			if(is_Attacking){
 				AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
 				if (OtherActor) {
 					DealDamage(OtherActor,is_hittet.Location);
@@ -170,23 +170,27 @@ UCameraComponent* AMyCharacter::getCamera()
 	return camera;
 }
 
+
 void AMyCharacter::decreasenemycount()
 {
 	count_of_enemies--;
+	target_object = nullptr;
 	UpdateEnemyCountUI(count_of_enemies);
 	//Check if no enemies is on map
 	CheckWinning();
 }
 
-float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void AMyCharacter::HealthChanged(const FOnAttributeChangeData& Data)
 {
-	if (can_apply && !is_block) {
-		if (helth > 0.0f && helth != 0.0f) {
-			helth -= DamageAmount;
-			UpdateUI(GetHelth(), GetMaxHelth());
+	if (!is_block) {
+		
+		if (Data.NewValue < Data.OldValue) {
+			//Call Bluprint method "DamageTake"
+			DamageTaken();
+			
 		}
 		//Dead
-		else {
+		if (GetHelth() == 0.0f) {
 			//Remove Player UI
 			UI->RemoveFromViewport();
 			GameOver = CreateWidget<UUserWidget>(GetWorld(), GameOverWidget);
@@ -198,19 +202,21 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 			UGameplayStatics::SetGamePaused(GetWorld(), true);
 			GameOver->AddToViewport(0);
 			this->Destroy();
+			return;
 		}
-		//Call Bluprint method "DamageTake"
-		DamageTaken();
-		return DamageAmount;
+		else {
+			UpdateUI(GetHelth(), GetMaxHelth());
+			return;
+		}
 	}
-	return DamageAmount;
 }
-
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	if (IsValid(GA_Component)) {
 		AttributeSet = GA_Component->GetSet<UCharacterAttributeSet>();
+		// Attribute change callbacks
+		GA_Component->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHelthAttribute()).AddUObject(this, &AMyCharacter::HealthChanged);
 	}
 	//Create Player UI
 	UI = CreateWidget<UUserWidget>(GetWorld(), WidgetUI);
@@ -296,6 +302,7 @@ void AMyCharacter::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet,
 		GA_Component->InitAbilityActorInfo(this, this);
 	}
 }
+
 
 void AMyCharacter::StartCheckIsBack()
 {

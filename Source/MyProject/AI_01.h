@@ -23,9 +23,6 @@ public:
 	//SetSpeed
 	void SetMaxWalkSpeed(float speed);
 
-	//Bluprint RecieveDamage
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
-	void DamageTaken();
 
 	//Play Attack Animation 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "DamageSystem")
@@ -47,7 +44,9 @@ public:
 	void Grand();
 	//Bluprint RecieveDamage
 	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
-	void DealDamage();
+	void DamageTaken();
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
+	void MakeDamage(AActor* Target, FVector HitLocation);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -63,8 +62,6 @@ public:
 
 
 private:
-	//ReceiveDamage
-	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -83,9 +80,9 @@ protected:
 	float maxhelth = 200.0f;
 	UPROPERTY(EditAnywhere, Category = Properties)
 	float helth = maxhelth;
-	//Can Take Damage
+	//Is Player Attack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
-	bool can_apply = true;
+	bool is_Attacking = true;
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
 	class UAbilitySystemComponent* GA_Component;
@@ -98,8 +95,6 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "GAS")
 	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 InputID);
 protected:
-	//Delegated
-	FDelegateHandle HealthChangedDelegateHandle;
 	// Attribute changed callbacks
 	void HealthChanged(const FOnAttributeChangeData& Data);
 };

@@ -111,8 +111,6 @@ private:
 	TSubclassOf<UUserWidget> WidgetUI;
 	//AI stimuli source
 	UAIPerceptionStimuliSourceComponent* source_hear;
-	//Recive damage from Enemy
-	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void BeginPlay() override;
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -144,21 +142,18 @@ protected:
 	//IS weapon equiped
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	bool is_weapon_equiped;
-	//Variable to take only one damage by sword trace
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
-	bool can_apply = true;
 	//Block variable
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_block = false;
+	//Is Player Attack
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
+	bool is_Attacking = true;
 	//bool variable if object is under targetting 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_targeting = false;
 	//Object that is targetting
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Targets)
 	AActor* target_object;
-	//Is Player Attack
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
-	bool is_Attacking = true;
 	//Is PLayer Crouch
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_Crouch = false;
@@ -173,5 +168,8 @@ protected:
     const class UCharacterAttributeSet* AttributeSet;
 	UFUNCTION(BlueprintCallable, Category = "GAS")
 	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 InputID);
+protected:
+	// Attribute changed callbacks
+	void HealthChanged(const FOnAttributeChangeData& Data);
 
 };
