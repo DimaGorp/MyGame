@@ -9,10 +9,13 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/ArrowComponent.h"
 #include "MotionWarpingComponent.h"
+#include "AbilitySystemInterface.h"
+#include "GAS/CharacterAttributeSet.h"
+#include "Abilities/GameplayAbility.h"
 #include "MyCharacter.generated.h"
 
 UCLASS()
-class MYPROJECT_API AMyCharacter : public ACharacter
+class MYPROJECT_API AMyCharacter : public ACharacter,public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -69,8 +72,23 @@ public:
 	//TargetAtBack
 	UFUNCTION(BlueprintCallable)
 	void StartCheckIsBack();
+	//PLayer UI Update enemy count icon
 	UFUNCTION(BlueprintImplementableEvent, Category = "UI")
 	void UpdateEnemyCountUI(int enemies);
+	//Attributes parametrs getters
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetHelth() const;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetMaxHelth() const;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetStamina() const;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	float GetMaxStamina() const;
+	//GrandPlayer and Ability
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
+	void GrandAbility();
+	UFUNCTION(BlueprintImplementableEvent, Category = "GAS")
+	void DealDamage(AActor * Target,FVector HitLocation);
 private:
 	//Properties
 	//Speed
@@ -93,17 +111,17 @@ private:
 	TSubclassOf<UUserWidget> WidgetUI;
 	//AI stimuli source
 	UAIPerceptionStimuliSourceComponent* source_hear;
-	//Recive damage from Enemy
-	float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void BeginPlay() override;
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 	//Target Lock objects
 	void StartTarget();
 	void CheckWinning();
 protected:
 	//Components in Viewport 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	USpringArmComponent* SpringArmComp;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	UCameraComponent* camera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -116,7 +134,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	int count_of_potions = 0;
 
-	//BottleOfPotionHealing
+	//EnemiesAmount
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	int count_of_enemies = 0;
 
@@ -124,21 +142,34 @@ protected:
 	//IS weapon equiped
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Variables)
 	bool is_weapon_equiped;
-	//Variable to take onlu one damage by sphere trace
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
-	bool can_apply = true;
 	//Block variable
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_block = false;
-	//Object that is target
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
-	bool is_targeting = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Targets)
-	AActor* target_object;
 	//Is Player Attack
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
-	bool is_Attacking = false;
+	bool is_Attacking = true;
+	//bool variable if object is under targetting 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
+	bool is_targeting = false;
+	//Object that is targetting
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Targets)
+	AActor* target_object;
+	//Is PLayer Crouch
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Properties)
 	bool is_Crouch = false;
+//Gameplay Ability System
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="GAS")
+	class UAbilitySystemComponent* GA_Component;
+	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override{
+		return GA_Component;
+	}
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "GAS")
+    const class UCharacterAttributeSet* AttributeSet;
+	UFUNCTION(BlueprintCallable, Category = "GAS")
+	void InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 InputID);
+protected:
+	// Attribute changed callbacks
+	void HealthChanged(const FOnAttributeChangeData& Data);
 
 };

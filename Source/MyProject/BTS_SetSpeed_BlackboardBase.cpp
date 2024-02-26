@@ -16,6 +16,7 @@ void UBTS_SetSpeed_BlackboardBase::TickNode(UBehaviorTreeComponent& OwnerComp, u
 		AAI_01 *pawn = Cast<AAI_01>(controller->GetPawn());
 		if (pawn)
 		{
+			//Set AI speed
 			pawn->SetMaxWalkSpeed(speed);
 		}
 	}

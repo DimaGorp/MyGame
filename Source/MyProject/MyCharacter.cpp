@@ -11,6 +11,8 @@
 #include "MotionWarpingComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
+#include "AbilitySystemComponent.h"
+#include "GAS/CharacterAttributeSet.h"
 #include <iostream>
 #include <cmath>
 // Sets default values
@@ -18,7 +20,7 @@ AMyCharacter::AMyCharacter():Super()
 {
 	speed = 0.0f;
  	//Components in ViewPort
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 	SpringArmComp = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComp->SetupAttachment(RootComponent);
 	SpringArmComp->TargetArmLength = 500.0f;
@@ -38,9 +40,12 @@ AMyCharacter::AMyCharacter():Super()
 	source_hear->RegisterForSense(UAISense_Hearing::StaticClass());
 	this->GetCharacterMovement()->MaxWalkSpeed = speed + 250.0f;
 
+	//Gameplay Ability System Component
+	GA_Component = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("GameplayAbilitySystem Component"));
+
 
 }
-
+//Binding
 void AMyCharacter::SetupPlayerInputComponent(class UInputComponent* MyInputComponent)
 {
 	Super::SetupPlayerInputComponent(MyInputComponent);
@@ -117,9 +122,11 @@ void AMyCharacter::MakingNoise(float volume)
 
 bool AMyCharacter::Heal()
 {
+	//check amount of potions
 	if (count_of_potions > 0) {
 		if (helth != maxhelth) {
 			helth += (maxhelth - helth);
+			//add helth 
 			UpdateUI(helth, maxhelth);
 			count_of_potions--;
 			return true;
@@ -133,18 +140,24 @@ void AMyCharacter::Attack(USkeletalMeshComponent* Player,UArrowComponent* top,FN
 	
 	if (is_weapon_equiped) {
 		FHitResult is_hittet;
+		//get location of sword socket
 		FVector start = Player->GetSocketLocation(sword_soket);
+		//get location of arrow on a sword
 		FVector end = top->GetComponentLocation();
 		TArray<AActor*> IgnoredActors;
 		IgnoredActors.Init(this,1);
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
 		ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+		//Sphere trace by sword
 		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 50.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 		if (is_hittet.bBlockingHit){
-			AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
-			if (OtherActor) {
-				UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
-
+			if(is_Attacking){
+				AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
+				if (OtherActor) {
+					DealDamage(OtherActor,is_hittet.Location);
+					is_Attacking = false;
+					//UGameplayStatics::ApplyDamage(OtherActor, 50, GetController(), this, UDamageType::StaticClass());
+				}
 			}
 		}
 	}
@@ -157,22 +170,28 @@ UCameraComponent* AMyCharacter::getCamera()
 	return camera;
 }
 
+
 void AMyCharacter::decreasenemycount()
 {
 	count_of_enemies--;
+	target_object = nullptr;
 	UpdateEnemyCountUI(count_of_enemies);
+	//Check if no enemies is on map
 	CheckWinning();
 }
 
-float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void AMyCharacter::HealthChanged(const FOnAttributeChangeData& Data)
 {
-	if (can_apply && !is_block) {
-		if (helth > 0.0f && helth != 0.0f) {
-			helth -= DamageAmount;
-			//UE_LOG(LogTemp, Warning, TEXT("Helth is %s"), *FString::SanitizeFloat(helth));
-			UpdateUI(helth, maxhelth);
+	if (!is_block) {
+		
+		if (Data.NewValue < Data.OldValue) {
+			//Call Bluprint method "DamageTake"
+			DamageTaken();
+			
 		}
-		else {
+		//Dead
+		if (GetHelth() == 0.0f) {
+			//Remove Player UI
 			UI->RemoveFromViewport();
 			GameOver = CreateWidget<UUserWidget>(GetWorld(), GameOverWidget);
 			APlayerController* MyController = GetWorld()->GetFirstPlayerController();
@@ -183,28 +202,51 @@ float AMyCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEve
 			UGameplayStatics::SetGamePaused(GetWorld(), true);
 			GameOver->AddToViewport(0);
 			this->Destroy();
+			return;
 		}
-		DamageTaken();
-		return DamageAmount;
+		else {
+			UpdateUI(GetHelth(), GetMaxHelth());
+			return;
+		}
 	}
-	return DamageAmount;
 }
-
 void AMyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	if (IsValid(GA_Component)) {
+		AttributeSet = GA_Component->GetSet<UCharacterAttributeSet>();
+		// Attribute change callbacks
+		GA_Component->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHelthAttribute()).AddUObject(this, &AMyCharacter::HealthChanged);
+	}
+	//Create Player UI
 	UI = CreateWidget<UUserWidget>(GetWorld(), WidgetUI);
-	UpdateUI(helth, maxhelth);
+	UpdateUI(GetHelth(), GetMaxHelth());
 	UI->AddToViewport();
+	//Show mouse cursor
 	APlayerController* MyController = GetWorld()->GetFirstPlayerController();
 	if (MyController) {
 		MyController->bShowMouseCursor = false;
 		MyController->SetInputMode(FInputModeGameOnly());
 	}
+	//Found AI`s on map
 	TArray<AActor*> FoundActors;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AAI_01::StaticClass(), FoundActors);
+	//set count of enemies
 	count_of_enemies = FoundActors.Num();
+	//Set amout of enemies at map in Player UI icon
 	UpdateEnemyCountUI(count_of_enemies);
+
+	GrandAbility();
+}
+
+void AMyCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	if (target_object) {
+		FRotator rot = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), target_object->GetActorLocation());
+		GetController()->SetControlRotation(FRotator(rot.Pitch - 25.0f,rot.Yaw,rot.Roll));
+	}
+	UpdateUI(GetHelth(), GetMaxHelth());
 }
 
 
@@ -222,7 +264,7 @@ void AMyCharacter::StartTarget()
 		IgnoredActors.Init(this, 1);
 		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
 		ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 100.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::ForDuration, is_hittet, true);
+		UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 200.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 		if (is_hittet.bBlockingHit) {
 			AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
 			if (OtherActor){
@@ -236,7 +278,9 @@ void AMyCharacter::StartTarget()
 void AMyCharacter::CheckWinning()
 {
 	if (count_of_enemies == 0) {
+		//Remove PlayerUI
 		UI->RemoveFromViewport();
+		//Show Winner UI
 		Win = CreateWidget<UUserWidget>(GetWorld(), WinWidget);
 		APlayerController* MyController = GetWorld()->GetFirstPlayerController();
 		if (MyController) {
@@ -249,16 +293,29 @@ void AMyCharacter::CheckWinning()
 	}
 }
 
+void AMyCharacter::InitializeAbility(TSubclassOf<UGameplayAbility> AbilityToGet, int32 InputID)
+{
+	if (GA_Component) {
+		if (HasAuthority() && AbilityToGet) {
+			GA_Component->GiveAbility(FGameplayAbilitySpec(AbilityToGet, 0, InputID));
+		}
+		GA_Component->InitAbilityActorInfo(this, this);
+	}
+}
+
+
 void AMyCharacter::StartCheckIsBack()
 {
 	FHitResult is_hittet;
 	FVector start = camera->GetComponentLocation();
 	FVector end = start + (camera->GetForwardVector() * 2000);
+	//Ignored actors
 	TArray<AActor*> IgnoredActors;
 	IgnoredActors.Init(this, 1);
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesArray;
 	ObjectTypesArray.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
-	UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 50.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::ForDuration, is_hittet, true);
+	//Sphere Trace
+	UKismetSystemLibrary::SphereTraceSingleForObjects(GetWorld(), start, end, 200.f, ObjectTypesArray, false, IgnoredActors, EDrawDebugTrace::None, is_hittet, true);
 	if (is_hittet.bBlockingHit) {
 		AAI_01* OtherActor = Cast<AAI_01>(is_hittet.GetActor());
 		if (OtherActor) {
@@ -270,9 +327,10 @@ void AMyCharacter::StartCheckIsBack()
 			RotRight *= 20.0f;
 			Location -= FVector(RotForward.X, RotForward.Y, 90.0f);
 			Location -= RotRight;
+			//Check the distance to an enemy
 			if ((GetActorLocation() - OtherActor->GetActorLocation()).Length() <= 300.0f){
+				//Check if the player is behind an enemy
 				if(UKismetMathLibrary::Dot_VectorVector(UKismetMathLibrary::GetDirectionUnitVector(GetActorLocation(), Location),GetActorForwardVector()) <=45.0f){
-				//if (UKismetMathLibrary::InverseTransformLocation(OtherActor->GetActorTransform(), Location).Y <= 0.0f) {
 					TakeDown(OtherActor, Location, Rotation);
 				}
 			}
@@ -281,12 +339,32 @@ void AMyCharacter::StartCheckIsBack()
 	}
 }
 
+float AMyCharacter::GetHelth() const
+{
+	return AttributeSet->GetHelth();
+}
+
+float AMyCharacter::GetMaxHelth() const
+{
+	return AttributeSet->GetMaxHelth();
+}
+
+float AMyCharacter::GetStamina() const
+{
+	return AttributeSet->GetStamina();
+}
+
+float AMyCharacter::GetMaxStamina() const
+{
+	return AttributeSet->GetMaxStamina();
+}
+
 
 void AMyCharacter::StartMWarping(FName victim, AActor* target)
 {
 	AAI_01* OtherActor = Cast<AAI_01>(target);
 	if (OtherActor) {
-		MotionWarpComponent->AddOrUpdateWarpTargetFromLocationAndRotation(victim, OtherActor->GetActorLocation(),GetActorRotation());
+		MotionWarpComponent->AddOrUpdateWarpTargetFromLocationAndRotation(victim, OtherActor->GetActorLocation(), OtherActor->GetActorRotation());
 	}
 }
 
@@ -295,7 +373,7 @@ void AMyCharacter::StartMWarpingComponent(FName victim, USceneComponent* target)
 	AAI_01* OtherActor = Cast<AAI_01>(target->GetOwner());
 	if (OtherActor) {
 		if (target) {
-			MotionWarpComponent->AddOrUpdateWarpTargetFromLocationAndRotation(victim, target->GetComponentLocation(), GetActorRotation());
+			MotionWarpComponent->AddOrUpdateWarpTargetFromLocationAndRotation(victim, target->GetComponentLocation(), target->GetComponentRotation());
 		}
 	}
 }

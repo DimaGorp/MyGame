@@ -17,6 +17,7 @@ public:
 	UBTS_SetSpeed_BlackboardBase();
 	virtual void TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
 private:
+	//Speed property
 	UPROPERTY(EditAnywhere)
 	float speed;
 	
