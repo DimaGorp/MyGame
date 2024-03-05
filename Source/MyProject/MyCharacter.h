@@ -30,9 +30,6 @@ public:
 	//camera rotation 
 	void Mouse_Up_Down(float mouseaxis);
 	void Mouse_R_L(float mouseaxis);
-	//jumping
-	void Jump();
-	void StopJump();
 	//sprinting
 	void StartSprint();
 	void StopSprint();
