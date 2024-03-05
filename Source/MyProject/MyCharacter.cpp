@@ -53,8 +53,6 @@ void AMyCharacter::SetupPlayerInputComponent(class UInputComponent* MyInputCompo
 	MyInputComponent->BindAxis("R_L_Movement", this, &AMyCharacter::R_L_Movement);
 	MyInputComponent->BindAxis("Mouse_Up_Down", this, &AMyCharacter::Mouse_Up_Down);
 	MyInputComponent->BindAxis("Mouse_R_L", this, &AMyCharacter::Mouse_R_L);
-	MyInputComponent->BindAction("Jump",IE_Pressed , this, &AMyCharacter::Jump);
-	MyInputComponent->BindAction("StopJump",IE_Released , this, &AMyCharacter::StopJump);
 	MyInputComponent->BindAction("Sprint", IE_Pressed, this, &AMyCharacter::StartSprint);
 	MyInputComponent->BindAction("Sprint", IE_Released, this, &AMyCharacter::StopSprint);
 	MyInputComponent->BindAction("Target", IE_Pressed, this, &AMyCharacter::StartTarget);
@@ -80,15 +78,6 @@ void AMyCharacter::Mouse_Up_Down(float mouseaxis)
 void AMyCharacter::Mouse_R_L(float mouseaxis)
 {
 	AddControllerPitchInput(200.f * mouseaxis * GetWorld()->GetDeltaSeconds());
-}
-
-void AMyCharacter::Jump()
-{
-	bPressedJump = true;
-}
-void AMyCharacter::StopJump()
-{
-	bPressedJump = false;
 }
 
 void AMyCharacter::StartSprint()
