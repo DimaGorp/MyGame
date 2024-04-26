@@ -267,6 +267,7 @@ void AMyCharacter::StartTarget()
 void AMyCharacter::CheckWinning()
 {
 	if (count_of_enemies == 0) {
+		UGameplayStatics::SetGamePaused(GetWorld(), true);
 		//Remove PlayerUI
 		UI->RemoveFromViewport();
 		//Show Winner UI
@@ -276,8 +277,6 @@ void AMyCharacter::CheckWinning()
 			MyController->bShowMouseCursor = true;
 			MyController->SetInputMode(FInputModeUIOnly());
 		}
-		UGameplayStatics::SetGamePaused(GetWorld(), true);
-		this->Destroy();
 		Win->AddToViewport(0);
 	}
 }
