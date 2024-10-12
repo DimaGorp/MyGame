@@ -1,2 +1,19 @@
-.uasset filter=lfs diff=lfs merge=lfs -text
-.umap filter=lfs diff=lfs merge=lfs -text
+# Track .uasset and .umap files in specific directories
+Content/AI/*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/AI/*.umap filter=lfs diff=lfs merge=lfs -text
+Content/Animations/**/*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/Animations/**/*.umap filter=lfs diff=lfs merge=lfs -text
+Content/Bluprints/**/*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/Bluprints/**/*.umap filter=lfs diff=lfs merge=lfs -text
+Content/GAS/**/*.uasset filter=lfs diff=lfs merge=lfs -text   # Track GAS assets
+Content/GAS/**/*.umap filter=lfs diff=lfs merge=lfs -text     # Track GAS maps
+Content/Models/**/*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/Models/**/*.umap filter=lfs diff=lfs merge=lfs -text
+Content/NiagaraSystem/**/*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/NiagaraSystem/**/*.umap filter=lfs diff=lfs merge=lfs -text
+Content/Widgets/**/*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/Widgets/**/*.umap filter=lfs diff=lfs merge=lfs -text
+Content/__ExternalActors__/ThirdPerson/**/*.uasset filter=lfs diff=lfs merge=lfs -text
+Content/__ExternalActors__/ThirdPerson/**/*.umap filter=lfs diff=lfs merge=lfs -text
+*.uasset filter=lfs diff=lfs merge=lfs -text
+*.umap filter=lfs diff=lfs merge=lfs -text
